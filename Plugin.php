@@ -188,6 +188,6 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
     }
 </script>
 JS;
-        echo PHP_EOL . '<script type="text/javascript" src="' . __TYPECHO_PLUGIN_DIR__ . '/AliveTitle/alivetitle.js" test="测试消息"></script>' . PHP_EOL;
+        echo PHP_EOL . '<script type="text/javascript" src="' . __TYPECHO_PLUGIN_DIR__ . '/AliveTitle/alivetitle.js"></script>' . PHP_EOL;
     }
 }
