@@ -71,7 +71,7 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
         $titleScroll = new Typecho\Widget\Helper\Form\Element\Radio(
             'titleScroll',
             [True => 'True', False => 'False'],
-            True,
+            1,
             _t('是否启用标题滚动'),
         );
 
@@ -94,7 +94,7 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
         $titleReplace = new Typecho\Widget\Helper\Form\Element\Radio(
             'titleReplace',
             [True => 'True', False => 'False'],
-            True,
+            1,
             _t('是否启用失焦替换'),
             _t('关闭则下方相关选项全部失效')
         );
@@ -102,7 +102,7 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
         $replaceScroll = new Typecho\Widget\Helper\Form\Element\Radio(
             'replaceScroll',
             [True => 'True', False => 'False'],
-            False,
+            0,
             _t('是否启用失焦滚动'),
         );
 
@@ -133,7 +133,7 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
         $pjax = new Typecho\Widget\Helper\Form\Element\Radio(
             'pjax',
             [True => 'True', False => 'False'],
-            False,
+            0,
             _t('兼容 PJAX 和 AJAX'),
             _t('原理是注册一个点击监听,如果不需要不建议启用<br />
             或者找到自己主题提供的重载接口在 alivetitle.js 中添加并填入 `title = document.title;` 保持 False 即可生效<br />
