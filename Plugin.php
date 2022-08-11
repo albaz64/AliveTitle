@@ -10,25 +10,27 @@ use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
 /**
- * 让你的标题动起来.
- * 无任何依赖,采用ES6编写.
+ * 让你的标题动起来!&nbsp;
+ * 无其他依赖,采用原生 ES6 编写.
  * 
  * 
  * @package AliveTitle
  * @author 酢豚
- * @version 0.9.4
+ * @version 1.0.0
  * @link https://blueeyeswhitedragon.xyz/
  * 
  * 
  * 0.9.1 更新内容:修改了实现方法(JQ->ES6),更贴近描述
  * 
- * 0.9.2 更新内容:简化了代码逻辑,去掉了华而不实的功能
+ * 0.9.2 更新内容:简化了代码逻辑
  * 
- * 0.9.3 更新内容:简化实现逻辑,去除伪静态(外链引用改为嵌入,这也是大部分插件的做法)
+ * 0.9.3 更新内容:简化实现逻辑,去除伪静态(其实是不会写两大服务器的伪静态规则)
  * 
- * 0.9.4 更新内容:暂时使用变量赋值,传参方式不太优雅
+ * 0.9.4 更新内容:暂时使用对象传参,参数传参对于字符串 + 数字形式不太理想
  * 
- * 0.9.5 更新内容:重构
+ * 0.9.5 更新内容:重构,并引入了新的 bug
+ * 
+ * 1.0.0 更新内容:解决了 PJAX 的兼容问题
  */
 class AliveTitle_Plugin implements Typecho_Plugin_Interface
 {
@@ -70,13 +72,13 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
             'titleScroll',
             [True => 'True', False => 'False'],
             True,
-            _t('是否启用滚动'),
+            _t('是否启用标题滚动'),
         );
 
         $scrollSpeed = new Typecho\Widget\Helper\Form\Element\Text(
             'scrollSpeed',
             NULL,
-            '1200',
+            '800',
             _t('标题滚动的速度'),
             _t('即多少毫秒滚动一个字,不建议过快')
         );
@@ -94,6 +96,14 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
             [True => 'True', False => 'False'],
             True,
             _t('是否启用失焦替换'),
+            _t('关闭则下方相关选项全部失效')
+        );
+
+        $replaceScroll = new Typecho\Widget\Helper\Form\Element\Radio(
+            'replaceScroll',
+            [True => 'True', False => 'False'],
+            False,
+            _t('是否启用失焦滚动'),
         );
 
         $replaceTimeout = new Typecho\Widget\Helper\Form\Element\Text(
@@ -107,7 +117,7 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
         $lostFocus = new Typecho\Widget\Helper\Form\Element\Text(
             'lostFocus',
             NULL,
-            '你一定又在看别的女人罢!',
+            '|･ω･｀)你看不见我……你看不见我……你看不见我……',
             _t('失去焦点时'),
             _t('当前页面处于不可见时触发,可见时点击页面以外区域不触发')
         );
@@ -115,18 +125,32 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
         $getFocus = new Typecho\Widget\Helper\Form\Element\Text(
             'getFocus',
             NULL,
-            '我也不差啊,再看看我',
+            '_(:3」」还是被发现了',
             _t('重新获得焦点时'),
             _t('如不需要和上面保持一致即可')
+        );
+
+        $pjax = new Typecho\Widget\Helper\Form\Element\Radio(
+            'pjax',
+            [True => 'True', False => 'False'],
+            False,
+            _t('兼容 PJAX 和 AJAX'),
+            _t('原理是注册一个点击监听,如果不需要不建议启用<br />
+            或者找到自己主题提供的重载接口在 alivetitle.js 中添加并填入 `title = document.title;` 保持 False 即可生效<br />
+            示例:&nbsp;<code>Aria.reloadAction = () => {<br />
+                title = document.title;<br />
+            }</code>')
         );
 
         $form->addInput($titleScroll); // 是否滚动
         $form->addInput($scrollSpeed); // 滚动速度
         $form->addInput($titleLength); // 标题长度
         $form->addInput($titleReplace); // 是否替换
+        $form->addInput($replaceScroll); // 是否失焦滚动
         $form->addInput($replaceTimeout); // 替换延时
-        $form->addInput($lostFocus); // 失焦
-        $form->addInput($getFocus); // 重新获焦
+        $form->addInput($lostFocus); // 失焦文本
+        $form->addInput($getFocus); // 重新获焦文本
+        $form->addInput($pjax); // 重新获焦文本
     }
 
     /**
@@ -156,12 +180,14 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
         scroolSpeed: $options->scrollSpeed,// 滚动速度
         titleLength: $options->titleLength,
         replace: $options->titleReplace,
+        replaceScroll: $options->replaceScroll,// 是否替换
         replaceTimeout: $options->replaceTimeout,// 替换延时
         lostFocus: `$options->lostFocus`,
-        getFocus: `$options->getFocus`
+        getFocus: `$options->getFocus`,
+        pjax_ajax: $options->pjax
     }
 </script>
 JS;
-        echo '<script type="text/javascript" src="' . __TYPECHO_PLUGIN_DIR__ . '/AliveTitle/alivetitle.js"></script>' . PHP_EOL;
+        echo PHP_EOL . '<script type="text/javascript" src="' . __TYPECHO_PLUGIN_DIR__ . '/AliveTitle/alivetitle.js" test="测试消息"></script>' . PHP_EOL;
     }
 }
