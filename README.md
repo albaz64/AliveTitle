@@ -5,7 +5,7 @@
   ![image](https://user-images.githubusercontent.com/80263760/184079283-2e8a4dd2-190d-4d6c-bab3-876a58a14e59.png)
 
 
-  [下载地址](https://github.com/XYZ-dragon/AliveTitle/releases/tag/v1.0.0)
+  [下载地址](https://github.com/XYZ-dragon/AliveTitle/releases/tag/v1.0.1)
 
 ## 使用方法
 
