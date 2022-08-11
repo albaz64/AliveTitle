@@ -9,10 +9,11 @@ if (alivetitle.pjax_ajax) document.addEventListener('mousedown', () => {
 
 /*
 手动添加重载示例
-*/
 Aria.reloadAction = () => {
 	title = document.title;
 }
+*/
+
 
 const sleep = time => {
 	return new Promise(resolve => {
