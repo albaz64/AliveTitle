@@ -2,6 +2,8 @@
 
 Typecho 插件,让标题动起来(配合颜文字和 emoji 表情使用效果更佳😜)
 
+下载地址: https://github.com/XYZ-dragon/AliveTitle/releases/tag/v1.0.0
+
 ## 使用方法
 
 - 将该插件上传到 typecho 目录下的 usr/plugins 目录下
@@ -19,3 +21,4 @@ Typecho 插件,让标题动起来(配合颜文字和 emoji 表情使用效果更
 - [x] 优化缺省值
 - [x] 兼容 PJAX
 - [ ] 修改传参方式
+- [ ] 修复点击过快产生的问题
