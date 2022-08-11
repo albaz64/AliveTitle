@@ -1,8 +1,10 @@
 # AliveTitle 简介
 
-Typecho 插件,让标题动起来(配合颜文字和 emoji 表情使用效果更佳😜)
+  Typecho 插件,让标题动起来(配合颜文字和 emoji 表情使用效果更佳😜)
 
-下载地址: https://github.com/XYZ-dragon/AliveTitle/releases/tag/v1.0.0
+  <img src="https://user-images.githubusercontent.com/80263760/184077997-7891681b-0aad-490c-9af2-24075477e815.png" alt="image" style="zoom: 50%;" />
+
+  [下载地址](https://github.com/XYZ-dragon/AliveTitle/releases/tag/v1.0.0)
 
 ## 使用方法
 
@@ -18,6 +20,7 @@ Typecho 插件,让标题动起来(配合颜文字和 emoji 表情使用效果更
 - **可以**支持 PJAX 的标题显示效果 --- 意思就是需要用户自己操作一下
 
 ## @TODO
+
 - [x] 优化缺省值
 - [x] 兼容 PJAX
 - [ ] 修改传参方式
