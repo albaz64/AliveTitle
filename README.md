@@ -2,7 +2,8 @@
 
   Typecho 插件,让标题动起来(配合颜文字和 emoji 表情使用效果更佳😜)
 
-  <img src="https://user-images.githubusercontent.com/80263760/184077997-7891681b-0aad-490c-9af2-24075477e815.png" alt="image" style="zoom: 50%;" />
+  ![image](https://user-images.githubusercontent.com/80263760/184079283-2e8a4dd2-190d-4d6c-bab3-876a58a14e59.png)
+
 
   [下载地址](https://github.com/XYZ-dragon/AliveTitle/releases/tag/v1.0.0)
 
@@ -17,7 +18,7 @@
 ## 特性
 
 - 不依赖 jQuery ,相比其他同类代码使用了新版的 ES6
-- **可以**支持 PJAX 的标题显示效果 --- 意思就是需要用户自己操作一下
+- 兼容支持 PJAX&AJAX 的标题显示效果
 
 ## @TODO
 
