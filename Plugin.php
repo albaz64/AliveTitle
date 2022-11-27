@@ -17,20 +17,22 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * @package AliveTitle
  * @author 酢豚
  * @version 1.0.0
- * @link https://blueeyeswhitedragon.xyz/
+ * @link https://kazusa.cc/
  * 
  * 
- * 0.9.1 更新内容:修改了实现方法(JQ->ES6),更贴近描述
+ * 0.9.1 修改了实现方法(JQ->ES6),更贴近描述
  * 
- * 0.9.2 更新内容:简化了代码逻辑
+ * 0.9.2 简化了代码逻辑
  * 
- * 0.9.3 更新内容:简化实现逻辑,去除伪静态(其实是不会写两大服务器的伪静态规则)
+ * 0.9.3 简化实现逻辑,去除伪静态(其实是不会写两大服务器的伪静态规则)
  * 
- * 0.9.4 更新内容:暂时使用对象传参,参数传参对于字符串 + 数字形式不太理想
+ * 0.9.4 暂时使用对象传参,参数传参对于字符串 + 数字形式不太理想
  * 
- * 0.9.5 更新内容:重构,并引入了新的 bug
+ * 0.9.5 重构,并引入了新的 bug
  * 
- * 1.0.0 更新内容:解决了 PJAX 的兼容问题
+ * 1.0.0 解决了 PJAX 的兼容问题
+ * 
+ * 1.0.1 增加简单的搜索引擎的爬虫蜘蛛检测,降低对页面抓取结果的影响
  */
 class AliveTitle_Plugin implements Typecho_Plugin_Interface
 {
@@ -173,6 +175,8 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
     public static function aliveTitle()
     {
         $options = Utils\Helper::options()->plugin('AliveTitle');
+        // 输出 JS 标志
+        $flag = true;
         echo <<<JS
 <script>
     let alivetitle = {
@@ -188,6 +192,13 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
     }
 </script>
 JS;
-        echo PHP_EOL . '<script type="text/javascript" src="' . __TYPECHO_PLUGIN_DIR__ . '/AliveTitle/alivetitle.js"></script>' . PHP_EOL;
+
+        foreach (['baidu', 'spider', 'bot', 'Google', 'https://'] as $i) {
+            if (stripos($_SERVER['HTTP_USER_AGENT'], $i) !== false) {
+                $flag = false;
+                break;
+            }
+        }
+        if ($flag)  echo PHP_EOL . '<script type="text/javascript" src="' . __TYPECHO_PLUGIN_DIR__ . '/AliveTitle/alivetitle.js"></script>' . PHP_EOL;
     }
 }
