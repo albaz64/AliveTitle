@@ -1,13 +1,15 @@
 <?php
 
-// namespace TypechoPlugin\AliveTitle;
-
-use Typecho\Plugin as Typecho_Plugin;
-use Typecho\Plugin\PluginInterface as Typecho_Plugin_Interface;
-use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
-
+namespace TypechoPlugin\AliveTitle;
 
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+
+// use Typecho\Plugin;
+use Typecho\Plugin\PluginInterface;
+use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Radio;
+use Typecho\Widget\Helper\Form\Element\Text;
+use Widget\Options;
 
 /**
  * 让你的标题动起来!&nbsp;
@@ -16,45 +18,34 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
  * 
  * @package AliveTitle
  * @author 酢豚
- * @version 1.0.0
- * @link https://kazusa.cc/
+ * @version 1.0.2
+ * @link https://kazusa.cc
  * 
  * 
  * 0.9.1 修改了实现方法(JQ->ES6),更贴近描述
  * 
  * 0.9.2 简化了代码逻辑
  * 
- * 0.9.3 简化实现逻辑,去除伪静态(其实是不会写两大服务器的伪静态规则)
- * 
- * 0.9.4 暂时使用对象传参,参数传参对于字符串 + 数字形式不太理想
- * 
  * 0.9.5 重构,并引入了新的 bug
  * 
  * 1.0.0 解决了 PJAX 的兼容问题
  * 
  * 1.0.1 增加简单的搜索引擎的爬虫蜘蛛检测,降低对页面抓取结果的影响
+ * 
+ * 1.0.2 重构代码并使用命名空间, 改为匿名函数, 修正一处拼写错误
  */
-class AliveTitle_Plugin implements Typecho_Plugin_Interface
+class Plugin implements PluginInterface
 {
     /**
      * 激活插件方法,如果激活失败,直接抛出异常
-     *
-     * @access public
-     * @return void
-     * @throws Typecho_Plugin_Exception
      */
     public static function activate()
     {
-        Typecho_Plugin::factory('Widget_Archive')->footer = array('AliveTitle_Plugin', 'aliveTitle');
+        \Typecho\Plugin::factory('Widget_Archive')->footer = __CLASS__ . '::aliveTitle';
     }
 
     /**
      * 禁用插件方法,如果禁用失败,直接抛出异常
-     *
-     * @static
-     * @access public
-     * @return void
-     * @throws Typecho_Plugin_Exception
      */
     public static function deactivate()
     {
@@ -63,86 +54,27 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
     /**
      * 获取插件配置面板
      *
-     * @access public
-     * @param Typecho_Widget_Helper_Form $form 配置面板
-     * @return void
+     * @param Form $form 配置面板
      */
-    public static function config(Typecho_Widget_Helper_Form $form)
+    public static function config(Form $form)
     {
+        $titleScroll = new Radio('titleScroll', [True => 'True', False => 'False'], 1, _t('是否启用标题滚动'));
 
-        $titleScroll = new Typecho\Widget\Helper\Form\Element\Radio(
-            'titleScroll',
-            [True => 'True', False => 'False'],
-            1,
-            _t('是否启用标题滚动'),
-        );
+        $scrollSpeed = new Text('scrollSpeed', NULL, '800', _t('标题滚动的速度（毫秒）'), _t('不建议过快'));
 
-        $scrollSpeed = new Typecho\Widget\Helper\Form\Element\Text(
-            'scrollSpeed',
-            NULL,
-            '800',
-            _t('标题滚动的速度'),
-            _t('即多少毫秒滚动一个字,不建议过快')
-        );
+        $titleLength = new Text('titleLength', NULL, '12', _t('滚动长度阈值(闭区间)'), _t('取值建议在 6 ~ 15 之间'));
 
-        $titleLength = new Typecho\Widget\Helper\Form\Element\Text(
-            'titleLength',
-            NULL,
-            '12',
-            _t('滚动长度阈值(闭区间)'),
-            _t('取值建议在 6 ~ 15 之间')
-        );
+        $titleReplace = new Radio('titleReplace', [True => 'True', False => 'False'], 1, _t('是否启用失焦替换'), _t('关闭则下方相关选项全部失效'));
 
-        $titleReplace = new Typecho\Widget\Helper\Form\Element\Radio(
-            'titleReplace',
-            [True => 'True', False => 'False'],
-            1,
-            _t('是否启用失焦替换'),
-            _t('关闭则下方相关选项全部失效')
-        );
+        $replaceScroll = new Radio('replaceScroll', [True => 'True', False => 'False'], 0, _t('是否启用失焦滚动'));
 
-        $replaceScroll = new Typecho\Widget\Helper\Form\Element\Radio(
-            'replaceScroll',
-            [True => 'True', False => 'False'],
-            0,
-            _t('是否启用失焦滚动'),
-        );
+        $replaceTimeout = new Text('replaceTimeout', NULL, '1200', _t('延时恢复标题'), _t('立即恢复填 0,单位毫秒'));
 
-        $replaceTimeout = new Typecho\Widget\Helper\Form\Element\Text(
-            'replaceTimeout',
-            NULL,
-            '1200',
-            _t('延时恢复标题'),
-            _t('立即恢复填 0,单位毫秒')
-        );
+        $lostFocus = new Text('lostFocus', NULL, '|･ω･｀)你看不见我……你看不见我……你看不见我……', _t('失去焦点时'), _t('当前页面处于不可见时触发,可见时点击页面以外区域不触发'));
 
-        $lostFocus = new Typecho\Widget\Helper\Form\Element\Text(
-            'lostFocus',
-            NULL,
-            '|･ω･｀)你看不见我……你看不见我……你看不见我……',
-            _t('失去焦点时'),
-            _t('当前页面处于不可见时触发,可见时点击页面以外区域不触发')
-        );
+        $getFocus = new Text('getFocus', NULL, '_(:3」」还是被发现了', _t('重新获得焦点时'), _t('如不需要和上面保持一致即可'));
 
-        $getFocus = new Typecho\Widget\Helper\Form\Element\Text(
-            'getFocus',
-            NULL,
-            '_(:3」」还是被发现了',
-            _t('重新获得焦点时'),
-            _t('如不需要和上面保持一致即可')
-        );
-
-        $pjax = new Typecho\Widget\Helper\Form\Element\Radio(
-            'pjax',
-            [True => 'True', False => 'False'],
-            0,
-            _t('兼容 PJAX 和 AJAX'),
-            _t('原理是注册一个点击监听,如果不需要不建议启用<br />
-            或者找到自己主题提供的重载接口在 alivetitle.js 中添加并填入 `title = document.title;` 保持 False 即可生效<br />
-            示例:&nbsp;<code>Aria.reloadAction = () => {<br />
-                title = document.title;<br />
-            }</code>')
-        );
+        $pjax = new Radio('pjax', [True => 'True', False => 'False'], 0, _t('兼容 PJAX 和 AJAX'), _t('原理是注册一个点击监听,如果不需要不建议启用<br />或者找到自己主题提供的重载接口在 alivetitle.js 中添加并填入 `title = document.title;` 即可生效<br />示例:&nbsp;<code>Aria.reloadAction = () => {<br />title = document.title;<br />}</code>'));
 
         $form->addInput($titleScroll); // 是否滚动
         $form->addInput($scrollSpeed); // 滚动速度
@@ -158,11 +90,9 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
     /**
      * 个人用户的配置面板
      *
-     * @access public
-     * @param Typecho_Widget_Helper_Form $form
-     * @return void
+     * @param Form $form
      */
-    public static function personalConfig(Typecho_Widget_Helper_Form $form)
+    public static function personalConfig(Form $form)
     {
     }
 
@@ -174,31 +104,45 @@ class AliveTitle_Plugin implements Typecho_Plugin_Interface
      */
     public static function aliveTitle()
     {
-        $options = Utils\Helper::options()->plugin('AliveTitle');
-        // 输出 JS 标志
-        $flag = true;
-        echo <<<JS
-<script>
-    let alivetitle = {
-        scroll: $options->titleScroll,
-        scroolSpeed: $options->scrollSpeed,// 滚动速度
-        titleLength: $options->titleLength,
-        replace: $options->titleReplace,
-        replaceScroll: $options->replaceScroll,// 是否替换
-        replaceTimeout: $options->replaceTimeout,// 替换延时
-        lostFocus: `$options->lostFocus`,
-        getFocus: `$options->getFocus`,
-        pjax_ajax: $options->pjax
-    }
-</script>
-JS;
+        $options = Options::alloc()->plugin('AliveTitle');
 
+        $script = sprintf(
+            '<script 
+    data-scroll="%s" 
+    data-scroll-speed="%s" 
+    data-title-length="%s" 
+    data-replace="%s" 
+    data-replace-scroll="%s" 
+    data-replace-timeout="%s" 
+    data-lost-focus="%s" 
+    data-get-focus="%s" 
+    data-pjax="%s" 
+    type="text/javascript"
+    src="%s/AliveTitle/alivetitle.js">
+</script>',
+            $options->titleScroll,
+            $options->scrollSpeed,
+            $options->titleLength,
+            $options->titleReplace,
+            $options->replaceScroll,
+            $options->replaceTimeout,
+            $options->lostFocus,
+            $options->getFocus,
+            $options->pjax,
+            __TYPECHO_PLUGIN_DIR__
+        );
+
+        // 避免搜索引擎收录问题
+        $flag = true;
         foreach (['baidu', 'spider', 'bot', 'Google', 'https://'] as $i) {
             if (stripos($_SERVER['HTTP_USER_AGENT'], $i) !== false) {
                 $flag = false;
                 break;
             }
         }
-        if ($flag)  echo PHP_EOL . '<script type="text/javascript" src="' . __TYPECHO_PLUGIN_DIR__ . '/AliveTitle/alivetitle.js"></script>' . PHP_EOL;
+
+        if ($flag) {
+            echo $script;
+        }
     }
 }
