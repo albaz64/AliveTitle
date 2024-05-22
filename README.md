@@ -6,7 +6,7 @@
 
 ## 使用方法
 
-- 直接 `git pull` 将该插件拉取到 typecho 目录下的 usr/plugins 目录下
+- 直接 `git clone` 将该插件拉取到 typecho 目录下的 usr/plugins 目录下
 - 修改文件夹名为 **AliveTitle** (大小写保持一致,否则可能出现其他问题)
 - 启用插件
 - 自定义选项
