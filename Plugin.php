@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TypechoPlugin\AliveTitle;
 
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
-// use Typecho\Plugin;
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
 use Typecho\Widget\Helper\Form\Element\Radio;
@@ -13,12 +14,12 @@ use Widget\Options;
 
 /**
  * 让你的标题动起来!&nbsp;
- * 无其他依赖,采用原生 ES6 编写.
+ * 无其他依赖, 采用原生 ES6 编写.
  * 
  * 
  * @package AliveTitle
  * @author 酢豚
- * @version 1.0.2
+ * @version 1.1.0
  * @link https://kazusa.cc
  * 
  * 
@@ -33,6 +34,9 @@ use Widget\Options;
  * 1.0.1 增加简单的搜索引擎的爬虫蜘蛛检测,降低对页面抓取结果的影响
  * 
  * 1.0.2 重构代码并使用命名空间, 改为匿名函数, 修正一处拼写错误
+ * 
+ * 1.1.0 按照官方 <https://joyqi.com/typecho/about-typecho-1-2-dev-plan.html> 推荐的编码风格 <https://www.php-fig.org/psr/psr-12/> 优化代码
+ *       TODO: 尝试使用添加路由的方式返回动态 JavaScript 内容
  */
 class Plugin implements PluginInterface
 {
@@ -107,16 +111,17 @@ class Plugin implements PluginInterface
         $options = Options::alloc()->plugin('AliveTitle');
 
         $script = sprintf(
-            '<script 
-    data-scroll="%s" 
-    data-scroll-speed="%s" 
-    data-title-length="%s" 
-    data-replace="%s" 
-    data-replace-scroll="%s" 
-    data-replace-timeout="%s" 
-    data-lost-focus="%s" 
-    data-get-focus="%s" 
-    data-pjax="%s" 
+            '<script
+    async
+    data-scroll="%s"
+    data-scroll-speed="%s"
+    data-title-length="%s"
+    data-replace="%s"
+    data-replace-scroll="%s"
+    data-replace-timeout="%s"
+    data-lost-focus="%s"
+    data-get-focus="%s"
+    data-pjax="%s"
     type="text/javascript"
     src="%s/AliveTitle/alivetitle.js">
 </script>',
@@ -133,16 +138,14 @@ class Plugin implements PluginInterface
         );
 
         // 避免搜索引擎收录问题
-        $flag = true;
-        foreach (['baidu', 'spider', 'bot', 'Google', 'https://'] as $i) {
-            if (stripos($_SERVER['HTTP_USER_AGENT'], $i) !== false) {
-                $flag = false;
-                break;
+        $keywords = ['baidu', 'spider', 'bot', 'google', 'https://'];
+        foreach ($keywords as $keyword) {
+            if (stripos($_SERVER['HTTP_USER_AGENT'], $keyword) !== false) {
+                // 直接结束插件函数
+                return;
             }
         }
 
-        if ($flag) {
-            echo $script;
-        }
+        echo $script;
     }
 }
